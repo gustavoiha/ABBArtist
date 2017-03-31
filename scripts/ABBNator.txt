@@ -1,0 +1,108 @@
+MODULE MainModule
+	CONST robtarget p0:=[[701.23,-162.44,819.04],[0.0153446,3.9186E-09,-0.999882,6.49243E-09],[-1,-1,-1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	CONST robtarget p10:=[[795.52,-527.96,1051.40],[0.613573,0.221685,0.734935,-0.185077],[-1,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    
+	PROC main()
+        
+       
+        
+        VAR iodev file;
+        VAR num number;
+        VAR string text;
+
+        VAR bool fileExists := FALSE;
+
+        VAR string filePath := "C:/ABBArtist/Coordinates/target.txt";
+
+        VAR num speed;
+        VAR num posX;
+        VAR num posY;
+        VAR num posZ;
+        
+        
+        TPErase;
+        TPWrite "Iniciatiling program ABB Artist...";
+        WaitTime 0.5;
+        TPWrite "Moving to start position";
+        
+        ! Moves to start position
+        MoveJ p0,v1000,z50,tool0;
+        
+        TPWrite "Let's Start Drawing =D";
+
+        !Delete left-over target.txt 
+        IF IsFile(filePath \RegFile) THEN
+            TPWrite ": Deleting "+filePath;
+            RemoveFile(filePath);
+        ENDIF
+    
+        !Message to start the program
+        TPWrite "ABB Artist is thinking...";
+ 
+        loop:
+            
+            !Check if file exists
+            fileExists := IsFile(filePath \RegFile);
+
+            !In case file doesn't exist, wait one second and repeat loop
+            IF NOT fileExists THEN
+                TPWrite "No file found. Waiting...";
+                WaitTime 1.0;
+                GOTO loop;
+            ENDIF
+
+            ! File format: <speed>:<x>|<y>|<z>;
+            Open filePath, file \Read;
+            TPWrite ReadStr(file);
+
+            ! Goes back to the start of the file
+            Rewind file;
+
+            ! Reads the desired speed
+            speed := ReadNum(file\Delim:=":");
+
+            ! Reads X, Y and Z
+            posX := ReadNum(file\Delim:="|");
+            posY := ReadNum(file\Delim:="|");
+            posZ := ReadNum(file\Delim:=";");
+
+            ! Validate speed: define minimum and maximum accepted values
+            IF speed < 10 THEN
+                speed := 10;
+            ENDIF
+            IF speed > 400 THEN
+                speed := 400;
+            ENDIF
+
+            Close file;
+
+            ! Debug
+            TPWrite
+                "SPEED: " + NumToStr(speed, 1) +
+                " X: " + NumToStr(posX, 1) +
+                " Y: "+ NumToStr(posY, 1) +
+                " Z: "+NumToStr(posZ, 1);
+
+            ! Goto Position
+            MoveL Offs(p0, posX, posY, posZ), [speed, 500, 5000, 1000], z0, tool0;
+
+            ! Delete file
+            RemoveFile(filePath);
+            TPWrite "Completed!";
+
+            ! Wait 10ms
+            WaitTime 0.010;
+            GOTO loop;
+
+
+        ERROR
+            IF ERRNO = ERR_FILEACC THEN
+                !TPWrite "File does not exists!";
+                !WaitTime 0.01;
+
+                fileExists := FALSE;
+                TRYNEXT;
+            ENDIF
+
+    	ENDPROC
+ENDMODULE
