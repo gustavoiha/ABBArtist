@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Monster Slayer</title>
+    <title>ABB Artist</title>
     <script src="https://npmcdn.com/vue/dist/vue.js"></script>
     <link rel="stylesheet" href="css/foundation.min.css">
     <link rel="stylesheet" href="css/app.css">
@@ -10,12 +10,21 @@
 <div id="app" style="text-align: center;">
 
   <div class="regular">
-    ABB Artist
+    ABB Artist {{ position.x - drawingboard.posX}}, {{ position.y - drawingboard.posY}}
   </div>
 
-  <section class="drawingboard">
-    <canvas id="canvas" width="drawingboard.width" height="drawingboard.height"></canvas>
-  </section>
+  <canvas
+    class="drawingboard"
+    id="canvas"
+    :width="drawingboard.width"
+    :height="drawingboard.height"
+    @mousedown="startDrawing"
+    @mouseup="stopDrawing"
+    @mouseleave="stopDrawing"
+    @mousemove="updateCoordinates"
+  ></canvas>
+
+  <button @click="clearBoard">Clear Board</button>
 
 </div>
 <script src="scripts/app.js"></script>
