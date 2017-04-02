@@ -9,7 +9,16 @@
 <body>
 <div id="app" style="text-align: center;">
 
+  <div id="mySidenav" class="sidenav" :style="{width: navBar.width}">
+    <a href="javascript:void(0)" class="closebutton" @click="closeNavBar">&times;</a>
+
+    <a v-for="link in navBar.links" :href="link.ref" :class="{active: link.isActive}">{{ link.title }}</a>
+
+  </div>
+
+
   <div class="regular">
+    <span style="font-size: 30px; cursor: pointer;" @click="switchNavBar">&#9776;</span>
     ABB Artist
   </div>
 

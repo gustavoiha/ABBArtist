@@ -14,7 +14,17 @@ var vm = new Vue({
       y: 0
     },
     counter: 0,
-    drawInterval: 50
+    drawInterval: 50,
+    navBar: {
+      width: '0',
+      openWidth: '200px',
+      isOpen: false,
+      links: [
+        {ref: '#', title: 'Home', isActive: true},
+        {ref: '#', title: 'About', isActive: false},
+        {ref: '#', title: 'Contacts', isActive: false}
+      ]
+    }
   },
   methods: {
 
@@ -43,6 +53,7 @@ var vm = new Vue({
       clearInterval(drawTimer);
     },
 
+    // Called to clear drawing board
     clearBoard: function(){
       drawingBoard.clearRect(0, 0, canvas.width, canvas.height);
     },
@@ -51,7 +62,25 @@ var vm = new Vue({
     updateCoordinates: function(event){
       this.position.x = event.clientX;
       this.position.y = event.clientY;
+    },
+
+    // Switches Navigation Bar state from open to close or vice-versa
+    switchNavBar: function(){
+      return this.navBar.isOpen ? this.closeNavBar() : this.openNavBar();
+    },
+
+    // Opens Navigation Bar
+    openNavBar: function(){
+      this.navBar.width = this.navBar.openWidth;
+      return this.navBar.isOpen = true;
+    },
+
+    // Closes Navigation Bar
+    closeNavBar: function(){
+      this.navBar.width = '0';
+      return this.navBar.isOpen = false;
     }
+
   },
   mounted: function(){
 
