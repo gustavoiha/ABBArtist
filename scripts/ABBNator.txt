@@ -4,8 +4,6 @@ MODULE MainModule
     
 	PROC main()
         
-       
-        
         VAR iodev file;
         VAR num number;
         VAR string text;
@@ -19,7 +17,6 @@ MODULE MainModule
         VAR num posY;
         VAR num posZ;
         
-        
         TPErase;
         TPWrite "Iniciatiling program ABB Artist...";
         WaitTime 0.5;
@@ -29,18 +26,13 @@ MODULE MainModule
         MoveJ p0,v1000,z50,tool0;
         
         TPWrite "Let's Start Drawing =D";
-
-        !Delete left-over target.txt 
-        IF IsFile(filePath \RegFile) THEN
-            TPWrite ": Deleting "+filePath;
-            RemoveFile(filePath);
-        ENDIF
-    
+        
+        WaitTime 2.0;
+        
         !Message to start the program
         TPWrite "ABB Artist is thinking...";
  
-        loop:
-            
+        fileNotExist:
             !Check if file exists
             fileExists := IsFile(filePath \RegFile);
 
@@ -48,16 +40,22 @@ MODULE MainModule
             IF NOT fileExists THEN
                 TPWrite "No file found. Waiting...";
                 WaitTime 1.0;
-                GOTO loop;
+                GOTO fileNotExist;
+            ELSE 
+                GOTO fileExist;
             ENDIF
-
+    
+        fileExist:
             ! File format: <speed>:<x>|<y>|<z>;
             Open filePath, file \Read;
-            TPWrite ReadStr(file);
+            
+            !Test: Writes the Strings in the file
+            !TPWrite ReadStr(file);
 
             ! Goes back to the start of the file
             Rewind file;
-
+            
+            !ToDO Loop ReadPosition:    
             ! Reads the desired speed
             speed := ReadNum(file\Delim:=":");
 
@@ -74,27 +72,22 @@ MODULE MainModule
                 speed := 400;
             ENDIF
 
-            Close file;
-
-            ! Debug
+            !Is really necessary? Close file;
+            
+            ! Test
             TPWrite
-                "SPEED: " + NumToStr(speed, 1) +
-                " X: " + NumToStr(posX, 1) +
-                " Y: "+ NumToStr(posY, 1) +
+                "SPEED: " + NumToStr(speed, 1) + "," +
+                " X: " + NumToStr(posX, 1) + "," +
+                " Y: "+ NumToStr(posY, 1) +"," +
                 " Z: "+NumToStr(posZ, 1);
-
-            ! Goto Position
+                
+            ! Robot GoTo Position (X,Y,Z)
             MoveL Offs(p0, posX, posY, posZ), [speed, 500, 5000, 1000], z0, tool0;
 
-            ! Delete file
-            RemoveFile(filePath);
+            ! Test: Delete every .txt file after read
+            ! RemoveFile(filePath);
             TPWrite "Completed!";
-
-            ! Wait 10ms
-            WaitTime 0.010;
-            GOTO loop;
-
-
+        
         ERROR
             IF ERRNO = ERR_FILEACC THEN
                 !TPWrite "File does not exists!";
