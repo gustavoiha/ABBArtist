@@ -1,6 +1,9 @@
 MODULE MainModule
 	CONST robtarget p0:=[[701.23,-162.44,819.04],[0.0153446,3.9186E-09,-0.999882,6.49243E-09],[-1,-1,-1,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
 	CONST robtarget p10:=[[795.52,-527.96,1051.40],[0.613573,0.221685,0.734935,-0.185077],[-1,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+	
+	
+	CONST readPositionTimer := 0.5; 
     
 	PROC main()
         
@@ -55,7 +58,11 @@ MODULE MainModule
             ! Goes back to the start of the file
             Rewind file;
             
-            !ToDO Loop ReadPosition:    
+	    
+            !ToDO: Test following Loop 
+	    
+	    
+	    ReadPosition:    
             ! Reads the desired speed
             speed := ReadNum(file\Delim:=":");
 
@@ -96,6 +103,13 @@ MODULE MainModule
                 fileExists := FALSE;
                 TRYNEXT;
             ENDIF
+	    
+	    !Test:
+	    !IF ERRNO = DESCOBRIRERRRO THEN
+	    	!WaitTime readPositionTimer
+	    	!GoTo ReadPosition
+		!TRYNEXT;
+	    !ENDIF
 
     	ENDPROC
 ENDMODULE
