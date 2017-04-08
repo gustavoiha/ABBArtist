@@ -43,7 +43,13 @@ var vm = new Vue({
         drawingBoard.lineTo(vm.position.x - vm.drawingboard.posX, vm.position.y - vm.drawingboard.posY);
         drawingBoard.stroke();
 
-        // Stores mouse position in .txt file every <this.drawInterval> miliseconds
+        // Send desired state to robot server
+        vm.setRobotState({
+          speed: 300,
+          x: vm.position.x - vm.drawingboard.posX,
+          y: vm.position.y - vm.drawingboard.posY,
+          z: 0
+        });
 
       }, this.drawInterval);
     },
@@ -79,6 +85,24 @@ var vm = new Vue({
     closeNavBar: function(){
       this.navBar.width = '0';
       return this.navBar.isOpen = false;
+    },
+
+    // Sends instruction to robot server
+    setRobotState: function(state){
+      console.log('begin');
+      var http = new XMLHttpRequest();
+
+      http.open("POST", "http://localhost:8080/", true);
+
+      http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+
+      // Send data as JSON
+      http.send(JSON.stringify(state));
+
+      // Done
+      http.onloadend = function () {
+        console.log('end');
+      };
     }
 
   },
