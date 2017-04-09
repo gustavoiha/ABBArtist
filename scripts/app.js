@@ -9,10 +9,16 @@ var vm = new Vue({
       posX: 0,
       poxY: 0
     },
-    position: {
+    mousePosition: {
       x: 0,
       y: 0
     },
+    drawState: {
+      speed: 0,
+      x: 0,
+      y: 0
+    },
+    isDrawing: false,
     counter: 0,
     drawInterval: 50,
     navBar: {
@@ -28,46 +34,72 @@ var vm = new Vue({
   },
   methods: {
 
-    // Starts <drawTimer>, which draws a line according to the mouse position every <this.drawInterval> miliseconds
+    // Draws in canvas while mouse is clicked
     startDrawing: function(){
 
       var vm = this;
 
+      this.isDrawing = true;
+
       // Begins a new path in canvas. This allows user to create any number of paths by clicking and releasing mouse buttons
-      drawingBoard.beginPath();
-      drawingBoard.moveTo(this.position.x - this.drawingboard.posX, this.position.y - this.drawingboard.posY);
-      //drawingBoard.moveTo(0,0);
+      drawingContext.beginPath();
+
+      this.updateDrawState();
+
+      // Stars line in mouse position
+      drawingContext.moveTo(this.drawState.x, this.drawState.y);
+
+      // Send desired state to robot server and makes robot lower pen to touch drawing board
+      this.setRobotState({
+        speed: 320,
+        x: vm.drawState.x,
+        y: vm.drawState.y,
+        z: 0
+      });
+
+      // Starts <drawTimer>, which draws a line according to the mouse position every <this.drawInterval> miliseconds
       drawTimer = setInterval(function(){
 
+        vm.updateDrawState();
+
         // Draws line that ends in mouse position
-        drawingBoard.lineTo(vm.position.x - vm.drawingboard.posX, vm.position.y - vm.drawingboard.posY);
-        drawingBoard.stroke();
+        drawingContext.lineTo(vm.drawState.x, vm.drawState.y);
+        drawingContext.stroke();
 
         // Send desired state to robot server
-        vm.setRobotState({
-          speed: 300,
-          x: vm.position.x - vm.drawingboard.posX,
-          y: vm.position.y - vm.drawingboard.posY,
-          z: 0
-        });
+        vm.setRobotState(vm.drawState);
 
       }, this.drawInterval);
     },
 
     // Called to stop <drawTimer> from executing
     stopDrawing: function(){
+
+      if (!this.isDrawing) return;
+
       clearInterval(drawTimer);
+
+      // Makes robot lift pen from drawing board
+      vm.setRobotState({
+        speed: 320,
+        x: vm.drawState.x,
+        y: vm.drawState.y,
+        z: 20
+      });
+
+      this.isDrawing = false;
+
     },
 
     // Called to clear drawing board
     clearBoard: function(){
-      drawingBoard.clearRect(0, 0, canvas.width, canvas.height);
+      drawingContext.clearRect(0, 0, canvas.width, canvas.height);
     },
 
     // Updates mouse position coordinates
     updateCoordinates: function(event){
-      this.position.x = event.clientX;
-      this.position.y = event.clientY;
+      this.mousePosition.x = event.clientX;
+      this.mousePosition.y = event.clientY;
     },
 
     // Switches Navigation Bar state from open to close or vice-versa
@@ -85,6 +117,23 @@ var vm = new Vue({
     closeNavBar: function(){
       this.navBar.width = '0';
       return this.navBar.isOpen = false;
+    },
+
+    // Calculates to which position robot should go
+    updateDrawState: function(){
+
+      oldX = this.drawState.x;
+      oldY = this.drawState.y;
+
+      newX = this.mousePosition.x - drawingCanvas.getBoundingClientRect().left;
+      newY = this.mousePosition.y - drawingCanvas.getBoundingClientRect().top;
+
+      this.drawState = {
+        speed: Math.round( Math.sqrt( Math.pow(newX - oldX, 2) + Math.pow(newY - oldY, 2) ) , 0),
+        x: newX,
+        y: newY,
+        z: 0
+      };
     },
 
     // Sends instruction to robot server
@@ -109,15 +158,18 @@ var vm = new Vue({
   mounted: function(){
 
     // Canvas rectangle properties
-    var drawingBoardRect = document.getElementById("canvas").getBoundingClientRect();
+    //var drawingBoardRect = document.getElementById("canvas").getBoundingClientRect();
 
-    this.drawingboard.posX = drawingBoardRect.left;
-    this.drawingboard.posY = drawingBoardRect.top;
+    //this.drawingboard.posX = drawingBoardRect.left;
+    //this.drawingboard.posY = drawingBoardRect.top;
   }
 });
 
 // Timer object
 var drawTimer = null;
 
+// Canvas object
+var drawingCanvas = document.getElementById("canvas");
+
 // Canvas drawing object
-var drawingBoard = document.getElementById("canvas").getContext("2d");
+var drawingContext = drawingCanvas.getContext("2d");
