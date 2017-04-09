@@ -130,8 +130,8 @@ var vm = new Vue({
 
       this.drawState = {
         speed: Math.round( Math.sqrt( Math.pow(newX - oldX, 2) + Math.pow(newY - oldY, 2) ) , 0),
-        x: newX,
-        y: newY,
+        x: parseInt(newX),
+        y: parseInt(newY),
         z: 0
       };
     },
