@@ -7,33 +7,43 @@
     <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<div id="app" style="text-align: center;">
+<div id="app">
 
   <div id="mySidenav" class="sidenav" :style="{width: navBar.width}">
-    <a href="javascript:void(0)" class="closebutton" @click="closeNavBar">&times;</a>
+    <img class="closebutton" @click="switchNavBar" src="src/buttons/Close_Clean.png"></img>
 
     <a v-for="link in navBar.links" :href="link.ref" :class="{active: link.isActive}">{{ link.title }}</a>
-
   </div>
 
+  <header>
+    <img class="icon_button" style="float: left;" @click="switchNavBar" src="src/buttons/Menu_Clean.png"></img>
+    <span>ABB Artist</span>
+    <img :class="{icon_button: true, rotating_button: true, rotate_button: settingsBar.isOpen}" style="float: right;" @click="switchSettingsBar" src="src/buttons/Settings_Gear.png"></img>
+  </header>
 
-  <div class="regular">
-    <span style="font-size: 30px; cursor: pointer;" @click="switchNavBar">&#9776;</span>
-    ABB Artist
-  </div>
+  <section class="main">
+    <div class="settings" :style="{width: settingsBar.width}">
+      <p>teste</p>
+    </div>
 
-  <canvas
-    class="drawingboard"
-    id="canvas"
-    :width="drawingboard.width"
-    :height="drawingboard.height"
-    @mousedown="startDrawing"
-    @mouseup="stopDrawing"
-    @mouseleave="stopDrawing"
-    @mousemove="updateCoordinates"
-  ></canvas>
+    <span class="user">
+      <canvas
+        class="drawingboard"
+        id="canvas"
+        width="800"
+        height="480"
+        @mousedown="startDrawing"
+        @mouseup="stopDrawing"
+        @mouseleave="stopDrawing"
+        @mousemove="updateCoordinates"
+      ></canvas>
 
-  <button @click="clearBoard">Clear Board</button>
+      <div class="controls">
+        <button @click="clearBoard">Clear Board</button>
+      </div>
+
+    </span>
+  </section>
 
 </div>
 <script src="scripts/app.js"></script>

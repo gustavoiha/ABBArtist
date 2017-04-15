@@ -3,12 +3,10 @@
 var vm = new Vue({
   el: '#app',
   data: {
-    drawingboard: {
+    /*drawingboard: {
       width: 800,
-      height: 500,
-      posX: 0,
-      poxY: 0
-    },
+      height: 480
+    },*/
     mousePosition: {
       x: 0,
       y: 0
@@ -30,6 +28,11 @@ var vm = new Vue({
         {ref: '#', title: 'About', isActive: false},
         {ref: '#', title: 'Contacts', isActive: false}
       ]
+    },
+    settingsBar: {
+      width: '0',
+      openWidth: '300px',
+      isOpen: false
     }
   },
   methods: {
@@ -104,19 +107,14 @@ var vm = new Vue({
 
     // Switches Navigation Bar state from open to close or vice-versa
     switchNavBar: function(){
-      return this.navBar.isOpen ? this.closeNavBar() : this.openNavBar();
+      this.navBar.width = this.navBar.isOpen ? '0': this.navBar.openWidth;
+      this.navBar.isOpen = !this.navBar.isOpen;
     },
 
-    // Opens Navigation Bar
-    openNavBar: function(){
-      this.navBar.width = this.navBar.openWidth;
-      return this.navBar.isOpen = true;
-    },
-
-    // Closes Navigation Bar
-    closeNavBar: function(){
-      this.navBar.width = '0';
-      return this.navBar.isOpen = false;
+    // Switches Settings Bar state from open to close or vice-versa
+    switchSettingsBar: function(){
+      this.settingsBar.width = this.settingsBar.isOpen ? '0': this.settingsBar.openWidth;
+      this.settingsBar.isOpen = !this.settingsBar.isOpen;
     },
 
     // Calculates to which position robot should go
@@ -125,8 +123,8 @@ var vm = new Vue({
       oldX = this.drawState.x;
       oldY = this.drawState.y;
 
-      newX = this.mousePosition.x - drawingCanvas.getBoundingClientRect().left;
-      newY = this.mousePosition.y - drawingCanvas.getBoundingClientRect().top;
+      newX = this.mousePosition.x - canvas.getBoundingClientRect().left;
+      newY = this.mousePosition.y - canvas.getBoundingClientRect().top;
 
       this.drawState = {
         speed: Math.round( Math.sqrt( Math.pow(newX - oldX, 2) + Math.pow(newY - oldY, 2) ) , 0),
@@ -154,22 +152,11 @@ var vm = new Vue({
       };
     }
 
-  },
-  mounted: function(){
-
-    // Canvas rectangle properties
-    //var drawingBoardRect = document.getElementById("canvas").getBoundingClientRect();
-
-    //this.drawingboard.posX = drawingBoardRect.left;
-    //this.drawingboard.posY = drawingBoardRect.top;
   }
 });
 
 // Timer object
 var drawTimer = null;
 
-// Canvas object
-var drawingCanvas = document.getElementById("canvas");
-
 // Canvas drawing object
-var drawingContext = drawingCanvas.getContext("2d");
+var drawingContext = canvas.getContext("2d");
