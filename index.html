@@ -23,7 +23,15 @@
 
   <section class="main">
     <div class="settings" :style="{width: settingsBar.width}">
-      <p>teste</p>
+      <a style="float: left;">
+        Width:
+        <input type="number" style="width: 70px;" v-model="robotDrawingBoard.width">
+      </a>
+
+      <a>
+        Height:
+        <input type="number" style="width: 70px;" v-model="robotDrawingBoard.height">
+      </a>
     </div>
 
     <span class="user">

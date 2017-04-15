@@ -3,10 +3,10 @@
 var vm = new Vue({
   el: '#app',
   data: {
-    /*drawingboard: {
-      width: 800,
-      height: 480
-    },*/
+    robotDrawingBoard: {
+      width: 400,
+      height: 300
+    },
     mousePosition: {
       x: 0,
       y: 0
@@ -136,6 +136,15 @@ var vm = new Vue({
 
     // Sends instruction to robot server
     setRobotState: function(state){
+
+      // Transform coordinates to robot's standard
+      transformedState = {
+        speed: state.speed,
+        x: state.x * this.robotDrawingBoard.width / canvas.width,
+        y: this.robotDrawingBoard.height - state.y * this.robotDrawingBoard.height / canvas.height,
+        z: state.z
+      };
+
       console.log('begin');
       var http = new XMLHttpRequest();
 
@@ -144,7 +153,7 @@ var vm = new Vue({
       http.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
 
       // Send data as JSON
-      http.send(JSON.stringify(state));
+      http.send(JSON.stringify(transformedState));
 
       // Done
       http.onloadend = function () {
