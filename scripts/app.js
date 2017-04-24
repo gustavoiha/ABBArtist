@@ -156,8 +156,8 @@ var vm = new Vue({
       // Transform coordinates to robot's standard
       transformedState = {
         speed: state.speed,
-        x: state.x * this.robotDrawingBoard.width / canvas.width,
-        y: this.robotDrawingBoard.height - state.y * this.robotDrawingBoard.height / canvas.height,
+        x: this.robotDrawingBoard.height - state.y * this.robotDrawingBoard.height / canvas.height,
+        y: -1 * state.x * this.robotDrawingBoard.width / canvas.width,
         z: state.z
       };
 
