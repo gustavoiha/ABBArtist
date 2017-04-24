@@ -87,3 +87,10 @@ var instructions = fs.createWriteStream(instructionsPath, {
 goToState = function(state){
   instructions.write(state.speed + ':' + state.x + '|' + state.y + '|' + state.z + ';' + '\r\n');
 }
+
+goToState({
+  speed: 0,
+  x: 0,
+  y: 0,
+  z: 0
+});

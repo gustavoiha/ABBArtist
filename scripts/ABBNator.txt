@@ -3,7 +3,7 @@ MODULE MainModule
 	CONST robtarget p10:=[[795.52,-527.96,1051.40],[0.613573,0.221685,0.734935,-0.185077],[-1,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
 	
 	
-	CONST readPositionTimer := 0.5; 
+	CONST num readPositionTimer := 0.5; 
     
 	PROC main()
         
@@ -13,7 +13,7 @@ MODULE MainModule
 
         VAR bool fileExists := FALSE;
 
-        VAR string filePath := "C:/ABBArtist/Coordinates/target.txt";
+        VAR string filePath := "D:/Projects/ABBArtist/Scripts/target.txt";
 
         VAR num speed;
         VAR num posX;
@@ -21,19 +21,15 @@ MODULE MainModule
         VAR num posZ;
         
         TPErase;
-        TPWrite "Iniciatiling program ABB Artist...";
-        WaitTime 0.5;
+        TPWrite "Starting program ABB Artist...";
+        WaitTime 1.0;
         TPWrite "Moving to start position";
+        WaitTime 1.0;
         
         ! Moves to start position
         MoveJ p0,v1000,z50,tool0;
         
         TPWrite "Let's Start Drawing =D";
-        
-        WaitTime 2.0;
-        
-        !Message to start the program
-        TPWrite "ABB Artist is thinking...";
  
         fileNotExist:
             !Check if file exists
@@ -62,7 +58,8 @@ MODULE MainModule
             !ToDO: Test following Loop 
 	    
 	    
-	    ReadPosition:    
+	    ReadPosition:
+            !TPWrite "Reading desired state...";
             ! Reads the desired speed
             speed := ReadNum(file\Delim:=":");
 
@@ -78,38 +75,40 @@ MODULE MainModule
             IF speed > 400 THEN
                 speed := 400;
             ENDIF
-
-            !Is really necessary? Close file;
             
-            ! Test
-            TPWrite
-                "SPEED: " + NumToStr(speed, 1) + "," +
-                " X: " + NumToStr(posX, 1) + "," +
-                " Y: "+ NumToStr(posY, 1) +"," +
-                " Z: "+NumToStr(posZ, 1);
-                
+            IF posX < 1000 AND posY < 1000 AND posZ < 1000 THEN
+            
             ! Robot GoTo Position (X,Y,Z)
             MoveL Offs(p0, posX, posY, posZ), [speed, 500, 5000, 1000], z0, tool0;
-
-            ! Test: Delete every .txt file after read
-            ! RemoveFile(filePath);
-            TPWrite "Completed!";
-        
+            
+            TPWrite
+            "SPEED: " + NumToStr(speed, 1) + "," +
+            " X: " + NumToStr(posX, 1) + "," +
+            " Y: " + NumToStr(posY, 1) + "," +
+            " Z: " + NumToStr(posZ, 1);
+            
+            ENDIF
+            
+            !TPWrite "Completed!";
+            
+            ! Read next state
+            GOTO ReadPosition;
+            
         ERROR
+        
             IF ERRNO = ERR_FILEACC THEN
-                !TPWrite "File does not exists!";
-                !WaitTime 0.01;
+                TPWrite "File does not exists!";
+                WaitTime 0.01;
 
                 fileExists := FALSE;
                 TRYNEXT;
             ENDIF
 	    
-	    !Test:
-	    !IF ERRNO = DESCOBRIRERRRO THEN
-	    	!WaitTime readPositionTimer
-	    	!GoTo ReadPosition
-		!TRYNEXT;
-	    !ENDIF
+	        IF ERRNO = 205 THEN
+    	    	WaitTime readPositionTimer;
+    		    TRYNEXT;
+    	    ENDIF
 
     	ENDPROC
+        
 ENDMODULE
