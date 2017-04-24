@@ -7,6 +7,10 @@ var vm = new Vue({
       width: 400,
       height: 300
     },
+    parameters: {
+      upDownSpeed: 100,
+      speedParameter: 10
+    },
     mousePosition: {
       x: 0,
       y: 0
