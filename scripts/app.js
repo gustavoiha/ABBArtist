@@ -9,7 +9,8 @@ var vm = new Vue({
     },
     parameters: {
       upDownSpeed: 100,
-      speedParameter: 10
+      speedParameter: 10,
+      raiseHeight: 20
     },
     mousePosition: {
       x: 0,
@@ -46,7 +47,7 @@ var vm = new Vue({
 
       var vm = this;
 
-      this.isDrawing = true;
+      
 
       // Begins a new path in canvas. This allows user to create any number of paths by clicking and releasing mouse buttons
       drawingContext.beginPath();
@@ -56,14 +57,25 @@ var vm = new Vue({
       // Stars line in mouse position
       drawingContext.moveTo(this.drawState.x, this.drawState.y);
 
-      // Send desired state to robot server and makes robot lower pen to touch drawing board
+      // Sends desired state to robot server and makes robot lower pen to touch drawing board only in the first point of a new path
+      if (!this.isDrawing) {
+        this.setRobotState({
+          speed: vm.parameters.upDownSpeed,
+          x: vm.drawState.x,
+          y: vm.drawState.y,
+          z: vm.parameters.raiseHeight
+        });
+      }
+    
       this.setRobotState({
-        speed: 320,
+        speed: vm.parameters.upDownSpeed,
         x: vm.drawState.x,
         y: vm.drawState.y,
         z: 0
       });
-
+      
+      this.isDrawing = true;
+      
       // Starts <drawTimer>, which draws a line according to the mouse position every <this.drawInterval> miliseconds
       drawTimer = setInterval(function(){
 
@@ -91,7 +103,7 @@ var vm = new Vue({
         speed: 320,
         x: vm.drawState.x,
         y: vm.drawState.y,
-        z: 20
+        z: vm.parameters.raiseHeight
       });
 
       this.isDrawing = false;
@@ -131,7 +143,7 @@ var vm = new Vue({
       newY = this.mousePosition.y - canvas.getBoundingClientRect().top;
 
       this.drawState = {
-        speed: Math.round( Math.sqrt( Math.pow(newX - oldX, 2) + Math.pow(newY - oldY, 2) ) , 0),
+        speed: this.parameters.speedParameter * Math.round( Math.sqrt( Math.pow(newX - oldX, 2) + Math.pow(newY - oldY, 2) ) , 0),
         x: parseInt(newX),
         y: parseInt(newY),
         z: 0
