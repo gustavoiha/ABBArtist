@@ -23,6 +23,7 @@
 
   <section class="main">
     <div class="settings" :style="{width: settingsBar.width}">
+        
       <a style="float: left;">
         Width:
         <input type="number" style="width: 70px;" v-model="robotDrawingBoard.width">
@@ -32,6 +33,17 @@
         Height:
         <input type="number" style="width: 70px;" v-model="robotDrawingBoard.height">
       </a>
+        
+      <a style="float: left;">
+        Up Down Speed:
+        <input type="number" style="width: 70px;" v-model="robotDrawingBoard.upDownSpeed">
+      </a>
+      
+      <a style="float: left;">
+        Speed Parameter (cm/px):
+        <input type="number" style="width: 70px;" v-model="robotDrawingBoard.speedParameter">
+      </a>
+      
     </div>
 
     <span class="user">
